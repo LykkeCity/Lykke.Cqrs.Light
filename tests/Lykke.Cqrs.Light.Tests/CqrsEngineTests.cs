@@ -51,7 +51,7 @@ namespace Lykke.Cqrs.Light.Tests
                             .ListeningCommands("exchange1", typeof(string))
                             .ListeningCommands("exchange2", typeof(string))))))
                 {
-                    engine.Start(null);
+                    engine.Init(null);
                     messagingEngine.Send("test1", new Endpoint("InMemory", "exchange1", serializationFormat: SerializationFormat.Json));
                     messagingEngine.Send("test2", new Endpoint("InMemory", "exchange2", serializationFormat: SerializationFormat.Json));
                     messagingEngine.Send("test3", new Endpoint("InMemory", "exchange3", serializationFormat: SerializationFormat.Json));
@@ -85,7 +85,7 @@ namespace Lykke.Cqrs.Light.Tests
                     Register.DefaultRouting(d => d.PublishingCommands("bc1", "defaultCommands", typeof(string), typeof(int))
                     )))
                 {
-                    engine.Start(null);
+                    engine.Init(null);
                     var received = new AutoResetEvent(false);
                     using (messagingEngine.Subscribe(defaultCommands, o => received.Set(), s => { }, typeof(string)))
                     {
@@ -148,7 +148,7 @@ namespace Lykke.Cqrs.Light.Tests
                     Register.DefaultRouting(d =>
                         d.PublishingCommands("operations", "defaultCommandsRoute", typeof(string), typeof(int)))
                 );
-                engine.Start(null);
+                engine.Init(null);
             }
         }
     }

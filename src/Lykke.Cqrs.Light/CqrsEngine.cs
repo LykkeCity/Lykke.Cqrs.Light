@@ -87,7 +87,7 @@ namespace Lykke.Cqrs.Light
             DefaultRouteMap = new RouteMap(DefaultContext);
         }
 
-        public void Start(IContainer container)
+        public void Init(IContainer container)
         {
             _dependencyResolver = new DependencyResolver(container);
 

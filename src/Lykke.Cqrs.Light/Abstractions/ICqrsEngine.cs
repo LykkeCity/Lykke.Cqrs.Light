@@ -18,7 +18,7 @@ namespace Lykke.Cqrs.Light.Abstractions
         [Obsolete("Use LogFactory")]
         ILog Log { get; }
 
-        void Start(IContainer container);
+        void Init(IContainer container);
         IEventPublisher GetEventPublisher(string context);
     }
 }

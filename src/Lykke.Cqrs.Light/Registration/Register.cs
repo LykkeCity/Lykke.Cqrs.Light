@@ -28,7 +28,7 @@ namespace Lykke.Cqrs.Light.Registration
             return new SagaRegistration(details);
         }
 
-        public static IRegistration Saga<T>(IEventHandler<T> saga, string contextName, Action<SagaDetails> detailsSetter)
+        public static IRegistration Saga(object saga, string contextName, Action<SagaDetails> detailsSetter)
         {
             var details = new SagaDetails(contextName, saga);
             detailsSetter.Invoke(details);

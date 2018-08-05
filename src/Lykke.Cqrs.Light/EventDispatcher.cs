@@ -18,6 +18,7 @@ namespace Lykke.Cqrs.Light
         private readonly ICommandSender _commandSender;
         private readonly ILog _log;
         private readonly long _failedEventRetryDelayInMs;
+        private readonly Type _interfaceGenericType = typeof(IEventHandler<>);
 
         internal EventDispatcher(
             ICommandSender commandSender,
@@ -56,9 +57,15 @@ namespace Lykke.Cqrs.Light
                 throw new InvalidOperationException(
                     $"Event handler for event {eventType.Name} is already registered in context {context}. Can't register for {handlerType.Name}.");
 
+            var mustImplementType = _interfaceGenericType.MakeGenericType(eventType);
+            if (!mustImplementType.IsAssignableFrom(handlerType))
+                throw new InvalidOperationException(
+                    $"Event handler {handlerType.Name} must implement IEventHandler<{eventType.Name}>.");
+
             var methodInfo = handlerType.GetMethod(nameof(IEventHandler<object>.HandleAsync), new[] { eventType, typeof(ICommandSender) });
-            if (methodInfo == null)
-                throw new InvalidOperationException($"Event handler {handlerType.Name} must implement IEventHandler<{eventType.Name}>.");
+            if (methodInfo?.ReturnType != typeof(Task<HandlingResult>))
+                throw new InvalidOperationException(
+                    $"Event handler {handlerType.Name} must have only 1 HandleAsync method with paramater of type {eventType.Name}>.");
 
             contextDict.Add(context, (e => (Task<HandlingResult>)methodInfo.Invoke(eventHandler, new [] { e, _commandSender}), handlerType.Name));
         }

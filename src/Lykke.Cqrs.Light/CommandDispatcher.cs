@@ -15,6 +15,7 @@ namespace Lykke.Cqrs.Light
             new Dictionary<Type, (Func<object, Task<HandlingResult>>, string)>();
         private readonly ILog _log;
         private readonly long _failedCommandRetryDelayInMs;
+        private readonly Type _interfaceGenericType = typeof(ICommandHandler<>);
 
         internal CommandDispatcher(ILogFactory logFactory, TimeSpan? failedCommandRetryDelay = null)
         {
@@ -45,9 +46,15 @@ namespace Lykke.Cqrs.Light
                     throw new InvalidOperationException(
                         $"Command handler for command {commandType.Name} is already registered. Can't register for {handlerType.Name}.");
 
+                var mustImplementType = _interfaceGenericType.MakeGenericType(commandType);
+                if (!mustImplementType.IsAssignableFrom(handlerType))
+                    throw new InvalidOperationException(
+                        $"Command handler {handlerType.Name} must implement ICommandHandler<{commandType.Name}>.");
+
                 var methodInfo = handlerType.GetMethod(nameof(ICommandHandler<object>.HandleAsync), new[] { commandType, typeof(IEventPublisher) });
-                if (methodInfo == null)
-                    throw new InvalidOperationException($"Command handler {handlerType.Name} must implement ICommandHandler<{commandType.Name}>.");
+                if (methodInfo?.ReturnType != typeof(Task<HandlingResult>))
+                    throw new InvalidOperationException(
+                        $"Command handler {handlerType.Name} must have only 1 HandleAsync method with paramater of type {commandType.Name}>.");
 
                 _handlersDict.Add(commandType, (c => (Task<HandlingResult>)methodInfo.Invoke(commandHandler, new[] { c, eventPublisher }), handlerType.Name));
             }

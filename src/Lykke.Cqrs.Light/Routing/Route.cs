@@ -3,6 +3,7 @@ using Lykke.Messaging;
 using Lykke.Messaging.Contract;
 using System;
 using System.Collections.Generic;
+using Common;
 
 namespace Lykke.Cqrs.Light.Routing
 {
@@ -42,7 +43,7 @@ namespace Lykke.Cqrs.Light.Routing
             IEndpointResolver resolver)
         {
             if (Type != RouteType.Commands)
-                throw new ApplicationException(string.Format("Can not publish commands with events route '{0}'.", Name));
+                throw new ApplicationException($"Can not publish commands with events route '{Name}'.");
 
             var routingKey = new RoutingKey
             {
@@ -52,13 +53,16 @@ namespace Lykke.Cqrs.Light.Routing
                 CommunicationType = CommunicationType.Publish,
                 TargetContext = targetContext
             };
+            if (_routeResolvers.ContainsKey(routingKey))
+                throw new InvalidOperationException($"There is already registered route resolver on route {Name} for key: {routingKey.ToJson()}");
+
             _routeResolvers[routingKey] = resolver;
         }
 
         internal void AddPublishedEvent(Type @event, IEndpointResolver resolver)
         {
             if (Type != RouteType.Events)
-                throw new ApplicationException(string.Format("Can not publish for events with commands route '{0}'.", Name));
+                throw new ApplicationException($"Can not publish events with commands route '{Name}'.");
 
             var routingKey = new RoutingKey
             {
@@ -67,13 +71,16 @@ namespace Lykke.Cqrs.Light.Routing
                 MessageType = @event,
                 CommunicationType = CommunicationType.Publish
             };
+            if (_routeResolvers.ContainsKey(routingKey))
+                throw new InvalidOperationException($"There is already registered route resolver on route {Name} for key: {routingKey.ToJson()}");
+
             _routeResolvers[routingKey] = resolver;
         }
 
         internal void AddSubscribedCommand(Type command, IEndpointResolver resolver)
         {
             if (Type != RouteType.Commands)
-                throw new ApplicationException(string.Format("Can not subscribe for commands on events route '{0}'.", Name));
+                throw new ApplicationException($"Can not subscribe for commands on events route '{Name}'.");
 
             var routingKey = new RoutingKey
             {
@@ -82,6 +89,9 @@ namespace Lykke.Cqrs.Light.Routing
                 RouteType = RouteType.Commands,
                 CommunicationType = CommunicationType.Subscribe
             };
+            if (_routeResolvers.ContainsKey(routingKey))
+                throw new InvalidOperationException($"There is already registered route resolver on route {Name} for key: {routingKey.ToJson()}");
+
             _routeResolvers[routingKey] = resolver;
         }
 
@@ -92,7 +102,7 @@ namespace Lykke.Cqrs.Light.Routing
             bool exclusive)
         {
             if (Type != RouteType.Events)
-                throw new ApplicationException(string.Format("Can not subscribe for events on commands route '{0}'.", Name));
+                throw new ApplicationException($"Can not subscribe for events on commands route '{Name}'.");
 
             var routingKey = new RoutingKey
             {
@@ -103,6 +113,9 @@ namespace Lykke.Cqrs.Light.Routing
                 CommunicationType = CommunicationType.Subscribe,
                 Exclusive = exclusive,
             };
+            if (_routeResolvers.ContainsKey(routingKey))
+                throw new InvalidOperationException($"There is already registered route resolver on route {Name} for key: {routingKey.ToJson()}");
+
             _routeResolvers[routingKey] = resolver;
         }
 

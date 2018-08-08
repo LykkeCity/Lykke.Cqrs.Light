@@ -9,20 +9,20 @@ namespace Lykke.Cqrs.Light.Registration
     [PublicAPI]
     public class CommandsHandlerDetails
     {
-        internal List<TypesData> CommandsData { get; set; }
-        internal List<TypesData> LoopbackCommandsData { get; set; }
-        internal List<TypesData> EventsData { get; set; }
-        internal Dictionary<string, uint> ThreadsDict { get; set; }
-        internal Dictionary<string, uint> QueuesDict { get; set; }
-        internal Type CommandHandlerType { get; set; }
-        internal object CommandHandler { get; set; }
+        internal List<TypesData> ListeningCommandsData { get; }
+        internal List<TypesData> LoopbackCommandsData { get; }
+        internal List<TypesData> PublishingEventsData { get; }
+        internal Dictionary<string, uint> ThreadsDict { get; }
+        internal Dictionary<string, uint> QueuesDict { get; }
+        internal Type CommandHandlerType { get; }
+        internal object CommandHandler { get; }
 
         internal CommandsHandlerDetails(Type commandHandlerType)
         {
             CommandHandlerType = commandHandlerType;
-            CommandsData = new List<TypesData>();
+            ListeningCommandsData = new List<TypesData>();
             LoopbackCommandsData = new List<TypesData>();
-            EventsData = new List<TypesData>();
+            PublishingEventsData = new List<TypesData>();
             ThreadsDict = new Dictionary<string, uint>();
             QueuesDict = new Dictionary<string, uint>();
         }
@@ -31,9 +31,9 @@ namespace Lykke.Cqrs.Light.Registration
         {
             CommandHandlerType = commandHandler.GetType();
             CommandHandler = commandHandler;
-            CommandsData = new List<TypesData>();
+            ListeningCommandsData = new List<TypesData>();
             LoopbackCommandsData = new List<TypesData>();
-            EventsData = new List<TypesData>();
+            PublishingEventsData = new List<TypesData>();
             ThreadsDict = new Dictionary<string, uint>();
             QueuesDict = new Dictionary<string, uint>();
         }
@@ -91,7 +91,7 @@ namespace Lykke.Cqrs.Light.Registration
                     throw new InvalidOperationException($"Command handler {CommandHandlerType.Name} must implement ICommandHandler<{commandType.Name}> interface");
             }
 
-            CommandsData.Add(
+            ListeningCommandsData.Add(
                 new TypesData
                 {
                     Route = route,
@@ -145,7 +145,7 @@ namespace Lykke.Cqrs.Light.Registration
             if (eventTypes.Any(i => i == null))
                 throw new ArgumentException("Event types list can't contain null value");
 
-            EventsData.Add(
+            PublishingEventsData.Add(
                 new TypesData
                 {
                     Route = route,
@@ -160,6 +160,9 @@ namespace Lykke.Cqrs.Light.Registration
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
+            if (threadCount == 0)
+                throw new ArgumentException($"Argument {nameof(threadCount)} must have positive value");
+
             ThreadsDict[route] = threadCount;
             return this;
         }
@@ -168,7 +171,10 @@ namespace Lykke.Cqrs.Light.Registration
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
-            ThreadsDict[route] = queueCapacity;
+            if (queueCapacity == 0)
+                throw new ArgumentException($"Argument {nameof(queueCapacity)} must have positive value");
+
+            QueuesDict[route] = queueCapacity;
             return this;
         }
     }

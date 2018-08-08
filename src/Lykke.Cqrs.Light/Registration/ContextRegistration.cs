@@ -12,11 +12,9 @@ namespace Lykke.Cqrs.Light.Registration
 
         internal ContextRegistration(ContextDetails details)
         {
-            if (details == null)
-                throw new ArgumentNullException(nameof(details));
             if (details.СommandsHandlerDetailsList.Count == 0
                 && details.ProjectionDetailsList.Count == 0
-                && details.CommandsDataDict.Count == 0)
+                && details.PublishingCommandsDataDict.Count == 0)
                 throw new InvalidOperationException(
                     $"For context {details.ContextName} at least 1 command handler or projection or 1 publising command must be configured");
 
@@ -35,16 +33,16 @@ namespace Lykke.Cqrs.Light.Registration
             foreach (var commandsHandlerDetails in _details.СommandsHandlerDetailsList)
             {
                 var handledCommandTypes = new HashSet<Type>();
-                foreach (var commandsDetails in commandsHandlerDetails.CommandsData)
+                foreach (var commandsDetails in commandsHandlerDetails.ListeningCommandsData)
                 {
                     string routeName = commandsDetails.Route;
                     var route = routeMap.GetRoute(routeName ?? CqrsEngine.DefaultRoute, RouteType.Commands);
                     if (!string.IsNullOrWhiteSpace(routeName))
                     {
-                        if (commandsHandlerDetails.ThreadsDict.ContainsKey(routeName))
-                            route.ProcessingGroup.ConcurrencyLevel = commandsHandlerDetails.ThreadsDict[routeName];
-                        if (commandsHandlerDetails.QueuesDict.ContainsKey(routeName))
-                            route.ProcessingGroup.QueueCapacity = commandsHandlerDetails.QueuesDict[routeName];
+                        if (commandsHandlerDetails.ThreadsDict.TryGetValue(routeName, out var threadsCount))
+                            route.ProcessingGroup.ConcurrencyLevel = threadsCount;
+                        if (commandsHandlerDetails.QueuesDict.TryGetValue(routeName, out var queueCapacity))
+                            route.ProcessingGroup.QueueCapacity = queueCapacity;
                     }
                     foreach (Type commandType in commandsDetails.Types)
                     {
@@ -61,7 +59,7 @@ namespace Lykke.Cqrs.Light.Registration
                         route.AddPublishedCommand(commandType, _details.ContextName, commandsDetails.EndpointResolver ?? cqrsEngine.DefaultEndpointResolver);
                     }
                 }
-                foreach (var eventsDetails in commandsHandlerDetails.EventsData)
+                foreach (var eventsDetails in commandsHandlerDetails.PublishingEventsData)
                 {
                     var route = routeMap.GetRoute(eventsDetails.Route ?? CqrsEngine.DefaultRoute, RouteType.Events);
                     foreach (Type eventType in eventsDetails.Types)
@@ -77,7 +75,7 @@ namespace Lykke.Cqrs.Light.Registration
             }
             foreach (var projectionDetails in _details.ProjectionDetailsList)
             {
-                foreach (var eventsDetails in projectionDetails.EventsData)
+                foreach (var eventsDetails in projectionDetails.ListeningEventsData)
                 {
                     var route = routeMap.GetRoute(eventsDetails.Route ?? CqrsEngine.DefaultRoute, RouteType.Events);
                     foreach (Type eventType in eventsDetails.Types)
@@ -92,7 +90,7 @@ namespace Lykke.Cqrs.Light.Registration
                     }
                 }
             }
-            foreach (var publichContextInfo in _details.CommandsDataDict)
+            foreach (var publichContextInfo in _details.PublishingCommandsDataDict)
             {
                 var typesData = publichContextInfo.Value;
                 var route = routeMap.GetRoute(typesData.Route ?? CqrsEngine.DefaultRoute, RouteType.Commands);

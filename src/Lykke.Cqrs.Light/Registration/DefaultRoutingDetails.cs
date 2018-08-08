@@ -9,11 +9,11 @@ namespace Lykke.Cqrs.Light.Registration
     [PublicAPI]
     public class DefaultRoutingDetails
     {
-        internal Dictionary<string, TypesData> CommandsDataDict { get; set; }
+        internal Dictionary<string, TypesData> PublishingCommandsDataDict { get; set; }
 
         internal DefaultRoutingDetails()
         {
-            CommandsDataDict = new Dictionary<string, TypesData>();
+            PublishingCommandsDataDict = new Dictionary<string, TypesData>();
         }
 
         public DefaultRoutingDetails PublishingCommands(string toContext, params Type[] commandTypes)
@@ -61,10 +61,10 @@ namespace Lykke.Cqrs.Light.Registration
                 throw new ArgumentNullException(nameof(commandTypes));
             if (commandTypes.Any(i => i == null))
                 throw new ArgumentException("Command types list can't contain null value");
-            if (CommandsDataDict.ContainsKey(toContext))
+            if (PublishingCommandsDataDict.ContainsKey(toContext))
                 throw new ArgumentException($"Command types are already registered for context {toContext}");
 
-            CommandsDataDict.Add(
+            PublishingCommandsDataDict.Add(
                 toContext,
                 new TypesData
                 {

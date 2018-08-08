@@ -10,9 +10,7 @@ namespace Lykke.Cqrs.Light.Registration
 
         internal DefaultRoutingRegistration(DefaultRoutingDetails details)
         {
-            if (details == null)
-                throw new ArgumentNullException(nameof(details));
-            if (details.CommandsDataDict.Count == 0)
+            if (details.PublishingCommandsDataDict.Count == 0)
                 throw new InvalidOperationException("Publishing commands list can't be empty");
 
             _details = details;
@@ -21,7 +19,7 @@ namespace Lykke.Cqrs.Light.Registration
         public Context CreateContext(ICqrsEngine cqrsEngine)
         {
             var routeMap = cqrsEngine.DefaultRouteMap;
-            foreach (var pair in _details.CommandsDataDict)
+            foreach (var pair in _details.PublishingCommandsDataDict)
             {
                 var route = routeMap.GetRoute(pair.Value.Route ?? CqrsEngine.DefaultRoute, RouteType.Commands);
                 foreach (Type commandType in pair.Value.Types)

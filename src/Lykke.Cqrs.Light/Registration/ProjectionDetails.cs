@@ -9,21 +9,21 @@ namespace Lykke.Cqrs.Light.Registration
     [PublicAPI]
     public class ProjectionDetails
     {
-        internal List<TypesData> EventsData { get; set; }
+        internal List<TypesData> ListeningEventsData { get; }
         internal Type ProjectionType { get; }
         internal object Projection { get; }
 
         internal ProjectionDetails(Type projectionType)
         {
             ProjectionType = projectionType;
-            EventsData = new List<TypesData>();
+            ListeningEventsData = new List<TypesData>();
         }
 
         internal ProjectionDetails(object projection)
         {
             Projection = projection;
             ProjectionType = projection.GetType();
-            EventsData = new List<TypesData>();
+            ListeningEventsData = new List<TypesData>();
         }
 
         public ProjectionDetails ListeningEvents(
@@ -60,7 +60,7 @@ namespace Lykke.Cqrs.Light.Registration
                     throw new InvalidOperationException($"Projection {ProjectionType.Name} must implement IProjection<{eventType.Name}> interface");
             }
 
-            EventsData.Add(
+            ListeningEventsData.Add(
                 new TypesData
                 {
                     Context = fromContext,

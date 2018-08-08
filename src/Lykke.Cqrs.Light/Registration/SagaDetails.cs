@@ -10,11 +10,11 @@ namespace Lykke.Cqrs.Light.Registration
     public class SagaDetails
     {
         internal string ContextName { get; }
-        internal Type SagaType { get; }
-        internal List<TypesData> CommandsData { get;  }
-        internal List<TypesData> EventsData { get;  }
+        internal List<TypesData> PublishingCommandsData { get; }
+        internal List<TypesData> ListeningEventsData { get;  }
         internal Dictionary<string, uint> ThreadsDict { get; }
         internal Dictionary<string, uint> QueuesDict { get; }
+        internal Type SagaType { get; }
         internal object Saga { get; }
 
         internal TimeSpan? FailedEventDelay { get; set; }
@@ -23,8 +23,8 @@ namespace Lykke.Cqrs.Light.Registration
         {
             ContextName = contextName;
             SagaType = sagaType;
-            CommandsData = new List<TypesData>();
-            EventsData = new List<TypesData>();
+            PublishingCommandsData = new List<TypesData>();
+            ListeningEventsData = new List<TypesData>();
             ThreadsDict = new Dictionary<string, uint>();
             QueuesDict = new Dictionary<string, uint>();
         }
@@ -34,8 +34,8 @@ namespace Lykke.Cqrs.Light.Registration
             ContextName = contextName;
             Saga = saga;
             SagaType = saga.GetType();
-            CommandsData = new List<TypesData>();
-            EventsData = new List<TypesData>();
+            PublishingCommandsData = new List<TypesData>();
+            ListeningEventsData = new List<TypesData>();
             ThreadsDict = new Dictionary<string, uint>();
             QueuesDict = new Dictionary<string, uint>();
         }
@@ -72,7 +72,7 @@ namespace Lykke.Cqrs.Light.Registration
                     throw new InvalidOperationException($"Saga {SagaType.Name} must implement IEventHandler<{eventType.Name}> interface");
             }
 
-            EventsData.Add(
+            ListeningEventsData.Add(
                 new TypesData
                 {
                     Context = fromContext,
@@ -130,7 +130,7 @@ namespace Lykke.Cqrs.Light.Registration
             if (commandTypes.Any(i => i == null))
                 throw new ArgumentException("Command types list can't contain null value");
 
-            CommandsData.Add(
+            PublishingCommandsData.Add(
                 new TypesData
                 {
                     Context = toContext,
@@ -146,6 +146,9 @@ namespace Lykke.Cqrs.Light.Registration
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
+            if (threadCount == 0)
+                throw new ArgumentException($"Argument {nameof(threadCount)} must have positive value");
+
             ThreadsDict[route] = threadCount;
             return this;
         }
@@ -154,12 +157,18 @@ namespace Lykke.Cqrs.Light.Registration
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
-            ThreadsDict[route] = queueCapacity;
+            if (queueCapacity == 0)
+                throw new ArgumentException($"Argument {nameof(queueCapacity)} must have positive value");
+
+            QueuesDict[route] = queueCapacity;
             return this;
         }
 
         public SagaDetails FailedEventRetryDelay(TimeSpan failRetryDelay)
         {
+            if (failRetryDelay.Ticks <= 0)
+                throw new ArgumentException("Delay must have some non-negative duration");
+
             FailedEventDelay = failRetryDelay;
             return this;
         }

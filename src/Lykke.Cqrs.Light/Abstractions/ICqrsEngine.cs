@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Cqrs.Light.Routing;
@@ -15,8 +14,6 @@ namespace Lykke.Cqrs.Light.Abstractions
         IEndpointResolver DefaultEndpointResolver { get; }
         RouteMap DefaultRouteMap { get; }
         ILogFactory LogFactory { get; }
-        [Obsolete("Use LogFactory")]
-        ILog Log { get; }
 
         void Init(IContainer container);
         IEventPublisher GetEventPublisher(string context);

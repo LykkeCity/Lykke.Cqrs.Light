@@ -16,7 +16,7 @@ namespace Lykke.Cqrs.Light.Registration
             PublishingCommandsDataDict = new Dictionary<string, TypesData>();
         }
 
-        public DefaultRoutingDetails PublishingCommands(string toContext, params Type[] commandTypes)
+        public DefaultRoutingDetails PublishingCommands([NotNull] string toContext, [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -26,9 +26,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public DefaultRoutingDetails PublishingCommands(
-            string toContext,
-            string route,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] string route = null,
+            [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -38,9 +38,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public DefaultRoutingDetails PublishingCommands(
-            string toContext,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -50,10 +50,10 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public DefaultRoutingDetails PublishingCommands(
-            string toContext,
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] string route = null,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             if (string.IsNullOrWhiteSpace(toContext))
                 throw new ArgumentNullException(nameof(toContext));

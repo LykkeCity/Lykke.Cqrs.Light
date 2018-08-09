@@ -1,4 +1,5 @@
-﻿using Lykke.Cqrs.Light.Abstractions;
+﻿using JetBrains.Annotations;
+using Lykke.Cqrs.Light.Abstractions;
 using Lykke.Cqrs.Light.Routing;
 using System;
 
@@ -16,8 +17,11 @@ namespace Lykke.Cqrs.Light.Registration
             _details = details;
         }
 
-        public Context CreateContext(ICqrsEngine cqrsEngine)
+        public Context CreateContext([ItemNotNull] ICqrsEngine cqrsEngine)
         {
+            if (cqrsEngine == null)
+                throw new ArgumentNullException();
+
             var routeMap = cqrsEngine.DefaultRouteMap;
             foreach (var pair in _details.PublishingCommandsDataDict)
             {

@@ -27,9 +27,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public ProjectionDetails ListeningEvents(
-            string fromContext,
-            string route,
-            params Type[] commandTypes)
+            [NotNull] string fromContext,
+            [NotNull] string route,
+            [NotNull] params Type[] commandTypes)
         {
             return ListeningEvents(
                 fromContext,
@@ -39,10 +39,10 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public ProjectionDetails ListeningEvents(
-            string fromContext,
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] eventTypes)
+            [NotNull] string fromContext,
+            [NotNull] string route,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] eventTypes)
         {
             if (string.IsNullOrWhiteSpace(fromContext))
                 throw new ArgumentNullException(nameof(fromContext));

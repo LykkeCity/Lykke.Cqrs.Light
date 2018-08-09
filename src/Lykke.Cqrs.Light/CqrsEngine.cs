@@ -19,6 +19,7 @@ namespace Lykke.Cqrs.Light
         private readonly CompositeDisposable _subscription = new CompositeDisposable();
         private readonly IMessagingEngine _messagingEngine;
         private readonly IRegistration[] _registrations;
+        private readonly ILog _log;
 
         private IDependencyResolver _dependencyResolver;
 
@@ -30,7 +31,6 @@ namespace Lykke.Cqrs.Light
         public IEndpointResolver DefaultEndpointResolver { get; }
         public RouteMap DefaultRouteMap { get; }
         public ILogFactory LogFactory { get; private set; }
-        public ILog Log { get; }
 
         internal CqrsEngine(
             IMessagingEngine messagingEngine,
@@ -42,26 +42,7 @@ namespace Lykke.Cqrs.Light
         {
             _messagingEngine = messagingEngine;
             LogFactory = logFactory;
-            Log = LogFactory.CreateLog(this);
-            _registrations = registrations;
-
-            FailedCommandRetryDelay = failedCommandRetryDelay;
-            FailedEventRetryDelay = failedEventRetryDelay;
-            DefaultEndpointResolver = defaultEndpointResolver;
-            DefaultRouteMap = new RouteMap(DefaultContext);
-        }
-
-        [Obsolete("Use ILogFactory")]
-        internal CqrsEngine(
-            IMessagingEngine messagingEngine,
-            IEndpointResolver defaultEndpointResolver,
-            ILog log,
-            TimeSpan? failedCommandRetryDelay,
-            TimeSpan? failedEventRetryDelay,
-            params IRegistration[] registrations)
-        {
-            _messagingEngine = messagingEngine;
-            Log = log;
+            _log = LogFactory.CreateLog(this);
             _registrations = registrations;
 
             FailedCommandRetryDelay = failedCommandRetryDelay;
@@ -79,7 +60,7 @@ namespace Lykke.Cqrs.Light
         {
             LogFactory = logFactory;
             _messagingEngine = messagingEngine;
-            Log = logFactory.CreateLog(this);
+            _log = logFactory.CreateLog(this);
             _dependencyResolver = dependencyResolver;
             _registrations = registrations;
 
@@ -228,7 +209,7 @@ namespace Lykke.Cqrs.Light
 
         private void EnsureEndpoints()
         {
-            Log.WriteInfo(nameof(EnsureEndpoints), null, "Endpoints verification");
+            _log.WriteInfo(nameof(EnsureEndpoints), null, "Endpoints verification");
 
             foreach (var routeMap in new[] { DefaultRouteMap }.Concat(_contextsDict.Values.Select(c => c.RouteMap)))
             {
@@ -237,13 +218,13 @@ namespace Lykke.Cqrs.Light
                     _messagingEngine.AddProcessingGroup(route.ProcessingGroupName, route.ProcessingGroup);
                 }
 
-                Log.WriteInfo(nameof(EnsureEndpoints), null, $"Context '{routeMap.Context}':");
+                _log.WriteInfo(nameof(EnsureEndpoints), null, $"Context '{routeMap.Context}':");
 
                 routeMap.ResolveRoutes();
 
                 foreach (var route in routeMap.Routes)
                 {
-                    Log.WriteInfo(nameof(EnsureEndpoints), null, $"\t{route.Type} route '{route.Name}':");
+                    _log.WriteInfo(nameof(EnsureEndpoints), null, $"\t{route.Type} route '{route.Name}':");
                     var routeTypeName = route.Type.ToString().ToLower().TrimEnd('s');
 
                     var allRoutes = route.PublishCommandRoutes
@@ -280,7 +261,7 @@ namespace Lykke.Cqrs.Light
                 true,
                 out string error))
             {
-                Log.WriteError(nameof(VerifyRoutingKey), routingKey, new InvalidOperationException(
+                _log.WriteError(nameof(VerifyRoutingKey), routingKey, new InvalidOperationException(
                     string.Format(
                         "Route '{1}' within bounded context '{0}' for {2} type '{3}' has resolved endpoint {4} that is not properly configured for {5}: {6}",
                         context,
@@ -293,7 +274,7 @@ namespace Lykke.Cqrs.Light
                 result = false;
             }
 
-            Log.WriteInfo(nameof(VerifyRoutingKey), routingKey, $"\t\tSubscribing '{routingKey.MessageType.Name}' on {endpoint}\t{(result ? "OK" : "ERROR:" + error)}");
+            _log.WriteInfo(nameof(VerifyRoutingKey), routingKey, $"\t\tSubscribing '{routingKey.MessageType.Name}' on {endpoint}\t{(result ? "OK" : "ERROR:" + error)}");
         }
 
         private void AddSubscriptions()

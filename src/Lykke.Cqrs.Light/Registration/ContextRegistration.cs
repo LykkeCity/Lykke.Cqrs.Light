@@ -3,6 +3,7 @@ using Lykke.Cqrs.Light.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Lykke.Cqrs.Light.Registration
 {
@@ -21,8 +22,11 @@ namespace Lykke.Cqrs.Light.Registration
             _details = details;
         }
 
-        public Context CreateContext(ICqrsEngine cqrsEngine)
+        public Context CreateContext([NotNull] ICqrsEngine cqrsEngine)
         {
+            if (cqrsEngine == null)
+                throw new ArgumentNullException();
+
             var routeMap = new RouteMap(_details.ContextName);
             var result = new Context(
                 _details.ContextName,

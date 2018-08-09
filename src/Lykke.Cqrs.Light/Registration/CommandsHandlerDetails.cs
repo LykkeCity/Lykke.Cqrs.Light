@@ -38,7 +38,7 @@ namespace Lykke.Cqrs.Light.Registration
             QueuesDict = new Dictionary<string, uint>();
         }
 
-        public CommandsHandlerDetails ListeningCommands(string route, params Type[] commandTypes)
+        public CommandsHandlerDetails ListeningCommands([NotNull] string route, [NotNull] params Type[] commandTypes)
         {
             return ListeningCommands(
                 route,
@@ -48,9 +48,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public CommandsHandlerDetails ListeningCommands(
-            string route,
+            [NotNull] string route,
             bool withLoopback,
-            params Type[] commandTypes)
+            [NotNull] params Type[] commandTypes)
         {
             return ListeningCommands(
                 route,
@@ -60,9 +60,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public CommandsHandlerDetails ListeningCommands(
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string route,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             return ListeningCommands(
                 route,
@@ -72,10 +72,10 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public CommandsHandlerDetails ListeningCommands(
-            string route,
+            [NotNull] string route,
             bool withLoopback,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             if (string.IsNullOrWhiteSpace(route))
                 throw new ArgumentNullException(nameof(route));
@@ -111,7 +111,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public CommandsHandlerDetails PublishingEvents(params Type[] eventTypes)
+        public CommandsHandlerDetails PublishingEvents([NotNull] params Type[] eventTypes)
         {
             return PublishingEvents(
                 null,
@@ -119,7 +119,7 @@ namespace Lykke.Cqrs.Light.Registration
                 eventTypes);
         }
 
-        public CommandsHandlerDetails PublishingEvents(IEndpointResolver endpointResolver, params Type[] eventTypes)
+        public CommandsHandlerDetails PublishingEvents([CanBeNull] IEndpointResolver endpointResolver = null, [NotNull] params Type[] eventTypes)
         {
             return PublishingEvents(
                 null,
@@ -127,7 +127,7 @@ namespace Lykke.Cqrs.Light.Registration
                 eventTypes);
         }
 
-        public CommandsHandlerDetails PublishingEvents(string route, params Type[] eventTypes)
+        public CommandsHandlerDetails PublishingEvents([CanBeNull] string route = null, [NotNull] params Type[] eventTypes)
         {
             return PublishingEvents(
                 route,
@@ -136,9 +136,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public CommandsHandlerDetails PublishingEvents(
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] eventTypes)
+            [CanBeNull] string route = null,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] eventTypes)
         {
             if (eventTypes == null || eventTypes.Length == 0)
                 throw new ArgumentNullException(nameof(eventTypes));
@@ -156,7 +156,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public CommandsHandlerDetails MultiThreaded(string route, uint threadCount)
+        public CommandsHandlerDetails MultiThreaded([NotNull] string route, uint threadCount)
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
@@ -167,7 +167,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public CommandsHandlerDetails QueueCapacity(string route, uint queueCapacity)
+        public CommandsHandlerDetails QueueCapacity([NotNull] string route, uint queueCapacity)
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));

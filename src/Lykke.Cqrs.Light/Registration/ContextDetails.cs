@@ -23,7 +23,7 @@ namespace Lykke.Cqrs.Light.Registration
             PublishingCommandsDataDict = new Dictionary<string, TypesData>();
         }
 
-        public ContextDetails AddCommandsHandler<T>(Action<CommandsHandlerDetails> detailsSetter)
+        public ContextDetails AddCommandsHandler<T>([NotNull] Action<CommandsHandlerDetails> detailsSetter)
         {
             if (detailsSetter == null)
                 throw new ArgumentNullException();
@@ -39,7 +39,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails AddCommandsHandler<T>(ICommandHandler<T> commandHandler, Action<CommandsHandlerDetails> detailsSetter)
+        public ContextDetails AddCommandsHandler<T>([NotNull] ICommandHandler<T> commandHandler, [NotNull] Action<CommandsHandlerDetails> detailsSetter)
         {
             if (commandHandler == null)
                 throw new ArgumentNullException(nameof(commandHandler));
@@ -75,7 +75,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails AddProjection<T>(Action<ProjectionDetails> detailsSetter)
+        public ContextDetails AddProjection<T>([NotNull] Action<ProjectionDetails> detailsSetter)
         {
             if (detailsSetter == null)
                 throw new ArgumentNullException();
@@ -89,7 +89,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails AddProjection<T>(IProjection<T> projection, Action<ProjectionDetails> detailsSetter)
+        public ContextDetails AddProjection<T>([NotNull] IProjection<T> projection, [NotNull] Action<ProjectionDetails> detailsSetter)
         {
             if (projection == null)
                 throw new ArgumentNullException(nameof(projection));
@@ -105,7 +105,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails PublishingCommands(string toContext, params Type[] commandTypes)
+        public ContextDetails PublishingCommands([NotNull] string toContext, [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -115,9 +115,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public ContextDetails PublishingCommands(
-            string toContext,
-            string route,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [NotNull] string route,
+            [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -127,10 +127,10 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public ContextDetails PublishingCommands(
-            string toContext,
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] string route = null,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             if (string.IsNullOrWhiteSpace(toContext))
                 throw new ArgumentNullException(nameof(toContext));

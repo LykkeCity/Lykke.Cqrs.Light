@@ -6,8 +6,8 @@ namespace Lykke.Cqrs.Light.Abstractions
     [PublicAPI]
     public class HandlingResult
     {
-        internal bool Retry { get; set; }
-        internal TimeSpan? RetryDelay { get; set; }
+        internal bool Retry { get; }
+        internal TimeSpan? RetryDelay { get; }
 
         internal HandlingResult(bool retry, TimeSpan? retryDelay = null)
         {

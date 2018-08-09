@@ -24,18 +24,11 @@ namespace Lykke.Cqrs.Light
         {
             Name = name;
             RouteMap = routeMap;
-            CommandDispatcher = cqrsEngine.LogFactory == null
-                ? new CommandDispatcher(cqrsEngine.Log, failedCommandRetryDelay)
-                : new CommandDispatcher(cqrsEngine.LogFactory, failedCommandRetryDelay);
-            EventDispatcher = cqrsEngine.LogFactory == null
-                ? new EventDispatcher(
-                    cqrsEngine,
-                    cqrsEngine.Log,
-                    failedEventRetryDelay)
-                : new EventDispatcher(
-                    cqrsEngine,
-                    cqrsEngine.LogFactory,
-                    failedEventRetryDelay);
+            CommandDispatcher = new CommandDispatcher(cqrsEngine.LogFactory, failedCommandRetryDelay);
+            EventDispatcher = new EventDispatcher(
+                cqrsEngine,
+                cqrsEngine.LogFactory,
+                failedEventRetryDelay);
             EventPublisher = cqrsEngine.GetEventPublisher(name);
         }
     }

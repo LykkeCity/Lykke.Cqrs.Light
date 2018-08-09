@@ -41,9 +41,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public SagaDetails ListeningEvents(
-            string fromContext,
-            string route,
-            params Type[] eventTypes)
+            [NotNull] string fromContext,
+            [NotNull] string route,
+            [NotNull] params Type[] eventTypes)
         {
             return ListeningEvents(
                 fromContext,
@@ -53,11 +53,13 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public SagaDetails ListeningEvents(
-            string fromContext,
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] eventTypes)
+            [NotNull] string fromContext,
+            [NotNull] string route,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] eventTypes)
         {
+            if (string.IsNullOrWhiteSpace(fromContext))
+                throw new ArgumentNullException(nameof(fromContext));
             if (string.IsNullOrWhiteSpace(route))
                 throw new ArgumentNullException(nameof(route));
             if (eventTypes == null || eventTypes.Length == 0)
@@ -84,7 +86,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public SagaDetails PublishingCommands(string toContext, params Type[] commandTypes)
+        public SagaDetails PublishingCommands([NotNull] string toContext, [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -94,9 +96,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public SagaDetails PublishingCommands(
-            string toContext,
-            string route,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] string route = null,
+            [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -106,9 +108,9 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public SagaDetails PublishingCommands(
-            string toContext,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
                 toContext,
@@ -118,10 +120,10 @@ namespace Lykke.Cqrs.Light.Registration
         }
 
         public SagaDetails PublishingCommands(
-            string toContext,
-            string route,
-            IEndpointResolver endpointResolver,
-            params Type[] commandTypes)
+            [NotNull] string toContext,
+            [CanBeNull] string route = null,
+            [CanBeNull] IEndpointResolver endpointResolver = null,
+            [NotNull] params Type[] commandTypes)
         {
             if (string.IsNullOrWhiteSpace(toContext))
                 throw new ArgumentNullException(nameof(toContext));
@@ -142,7 +144,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public SagaDetails MultiThreaded(string route, uint threadCount)
+        public SagaDetails MultiThreaded([NotNull] string route, uint threadCount)
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));
@@ -153,7 +155,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public SagaDetails QueueCapacity(string route, uint queueCapacity)
+        public SagaDetails QueueCapacity([NotNull] string route, uint queueCapacity)
         {
             if (string.IsNullOrEmpty(route))
                 throw new ArgumentNullException(nameof(route));

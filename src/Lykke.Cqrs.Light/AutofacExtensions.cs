@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Cqrs.Light.Abstractions;
@@ -42,21 +41,13 @@ namespace Lykke.Cqrs.Light
                     var messagingEngine = ctx.Resolve<IMessagingEngine>();
                     if (messagingEngine == null)
                         throw new InvalidOperationException($"{nameof(IMessagingEngine)} is not registered in Autofac container");
-                    if (ctx.TryResolve<ILogFactory>(out ILogFactory logFactory))
-                        return new CqrsEngine(
-                            messagingEngine,
-                            defaultEndpointResolver,
-                            logFactory,
-                            failedCommandRetryDelay,
-                            failedEventRetryDelay,
-                            registrations);
-                    var log = ctx.Resolve<ILog>();
-                    if (log == null)
-                        throw new InvalidOperationException($"Neither {nameof(ILogFactory)}, nor {nameof(ILog)} was registered in Autofac container");
+                    var logFatory = ctx.Resolve<ILogFactory>();
+                    if (logFatory == null)
+                        throw new InvalidOperationException($"{nameof(ILogFactory)} was not registered in Autofac container");
                     return new CqrsEngine(
                         messagingEngine,
                         defaultEndpointResolver,
-                        log,
+                        logFatory,
                         failedCommandRetryDelay,
                         failedEventRetryDelay,
                         registrations);

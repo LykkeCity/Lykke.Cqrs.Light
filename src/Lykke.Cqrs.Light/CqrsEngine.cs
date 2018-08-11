@@ -6,6 +6,7 @@ using Lykke.Cqrs.Light.Routing;
 using Lykke.Messaging.Contract;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
@@ -14,7 +15,7 @@ namespace Lykke.Cqrs.Light
 {
     internal sealed class CqrsEngine : ICqrsEngine, IDisposable
     {
-        private readonly Dictionary<Type, List<PublishRoute>> _typeRoutePointsDict = new Dictionary<Type, List<PublishRoute>>();
+        private readonly ConcurrentDictionary<Type, List<PublishRoute>> _typeRoutePointsDict = new ConcurrentDictionary<Type, List<PublishRoute>>();
         private readonly Dictionary<string, Context> _contextsDict = new Dictionary<string, Context>();
         private readonly CompositeDisposable _subscription = new CompositeDisposable();
         private readonly IMessagingEngine _messagingEngine;
@@ -149,9 +150,8 @@ namespace Lykke.Cqrs.Light
                     {
                         routeMap = GetRouteMap(null);
                         routePoints = routeMap.GetPublishRoutePoints(routeType, type);
-                        _typeRoutePointsDict[type] = routePoints;
                     }
-                    _typeRoutePointsDict[type] = routePoints;
+                    _typeRoutePointsDict.TryAdd(type, routePoints);
                 }
                 if (routePoints.Count == 0)
                     throw new InvalidOperationException($"Context '{sourceContext}' doesn't have routes for '{message.GetType()}'");

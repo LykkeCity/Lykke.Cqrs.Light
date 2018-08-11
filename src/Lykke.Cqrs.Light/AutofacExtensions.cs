@@ -39,11 +39,7 @@ namespace Lykke.Cqrs.Light
             containerBuilder.Register(ctx =>
                 {
                     var messagingEngine = ctx.Resolve<IMessagingEngine>();
-                    if (messagingEngine == null)
-                        throw new InvalidOperationException($"{nameof(IMessagingEngine)} is not registered in Autofac container");
                     var logFatory = ctx.Resolve<ILogFactory>();
-                    if (logFatory == null)
-                        throw new InvalidOperationException($"{nameof(ILogFactory)} was not registered in Autofac container");
                     return new CqrsEngine(
                         messagingEngine,
                         defaultEndpointResolver,

@@ -32,18 +32,6 @@ namespace Lykke.Cqrs.Light
                 : FailedEventRetryDelay;
         }
 
-        internal EventDispatcher(
-            ICommandSender commandSender,
-            ILog log,
-            TimeSpan? failedEventRetryDelay = null)
-        {
-            _commandSender = commandSender;
-            _log = log;
-            _failedEventRetryDelayInMs = failedEventRetryDelay.HasValue
-                ? (long)failedEventRetryDelay.Value.TotalMilliseconds
-                : FailedEventRetryDelay;
-        }
-
         internal void AddHandler(
             Type eventType,
             string context,

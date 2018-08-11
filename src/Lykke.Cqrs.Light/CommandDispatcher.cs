@@ -25,14 +25,6 @@ namespace Lykke.Cqrs.Light
                 : 60000;
         }
 
-        internal CommandDispatcher(ILog log, TimeSpan? failedCommandRetryDelay = null)
-        {
-            _log = log;
-            _failedCommandRetryDelayInMs = failedCommandRetryDelay.HasValue
-                ? (long)failedCommandRetryDelay.Value.TotalMilliseconds
-                : 60000;
-        }
-
         internal void AddHandler(
             object commandHandler,
             IEventPublisher eventPublisher,

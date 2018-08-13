@@ -29,13 +29,13 @@ namespace Lykke.Cqrs.Light.Registration
         public ProjectionDetails ListeningEvents(
             [NotNull] string fromContext,
             [NotNull] string route,
-            [NotNull] params Type[] commandTypes)
+            [NotNull] params Type[] eventTypes)
         {
             return ListeningEvents(
                 fromContext,
                 route,
                 null,
-                commandTypes);
+                eventTypes);
         }
 
         public ProjectionDetails ListeningEvents(

@@ -39,7 +39,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails AddCommandsHandler<T>([NotNull] ICommandHandler<T> commandHandler, [NotNull] Action<CommandsHandlerDetails> detailsSetter)
+        public ContextDetails AddCommandsHandler([NotNull] object commandHandler, [NotNull] Action<CommandsHandlerDetails> detailsSetter)
         {
             if (commandHandler == null)
                 throw new ArgumentNullException(nameof(commandHandler));
@@ -89,7 +89,7 @@ namespace Lykke.Cqrs.Light.Registration
             return this;
         }
 
-        public ContextDetails AddProjection<T>([NotNull] IProjection<T> projection, [NotNull] Action<ProjectionDetails> detailsSetter)
+        public ContextDetails AddProjection([NotNull] object projection, [NotNull] Action<ProjectionDetails> detailsSetter)
         {
             if (projection == null)
                 throw new ArgumentNullException(nameof(projection));
@@ -99,7 +99,7 @@ namespace Lykke.Cqrs.Light.Registration
             var details = new ProjectionDetails(projection);
             detailsSetter.Invoke(details);
             if (details.ListeningEventsData.Count == 0)
-                throw new InvalidOperationException($"Listening events list is not specified for command handler {typeof(T).Name}");
+                throw new InvalidOperationException($"Listening events list is not specified for command handler {details.ProjectionType.Name}");
 
             ProjectionDetailsList.Add(details);
             return this;

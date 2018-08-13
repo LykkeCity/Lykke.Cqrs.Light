@@ -116,7 +116,7 @@ namespace Lykke.Cqrs.Light.Registration
 
         public ContextDetails PublishingCommands(
             [NotNull] string toContext,
-            [NotNull] string route,
+            [CanBeNull] string route = null,
             [NotNull] params Type[] commandTypes)
         {
             return PublishingCommands(
